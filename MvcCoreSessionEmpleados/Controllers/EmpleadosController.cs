@@ -99,7 +99,17 @@ namespace MvcCoreSessionEmpleados.Controllers
 
         public async Task<IActionResult> EmpleadosAlmacenadosOk()
         {
-            return View();
+            List<int> idsEmpleados = HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
+            if(idsEmpleados == null)
+            {
+                ViewData["MENSAJE"] = "No existen empleados en Session";
+                return View();
+            }
+            else
+            {
+                List<Empleado> empleados = await this.repo.GetEmpleadosSessionAsync(idsEmpleados);
+                return View(empleados);
+            }
         }
 
     }
