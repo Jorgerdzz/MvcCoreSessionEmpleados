@@ -1,0 +1,24 @@
+﻿@{
+    List<int> idsEmpleados = Context.Session.GetObject<List<int>>("IDSEMPLEADOS");
+}
+
+@{
+    ViewData["Title"] = "EmpleadosAlmacenadosOk";
+}
+
+<h1 style="color:rebeccapurple">EmpleadosAlmacenadosOk</h1>
+
+<p>
+    <a asp-controller="Empleados" asp-action="SessionEmpleadosOk">Volver a empleados</a>
+</p>
+
+@if(idsEmpleados != null)
+{
+    <ul class="list-group-item">
+        @foreach (int id in idsEmpleados)
+        {
+           <li class="list-group-item">@id</li> 
+        }
+    </ul>
+}
+

@@ -75,5 +75,32 @@ namespace MvcCoreSessionEmpleados.Controllers
         {
             return View();
         }
+
+        public async Task<IActionResult> SessionEmpleadosOk(int? idEmpleado)
+        {
+            if(idEmpleado != null)
+            {
+                //ALMACENAMOS LO MINIMO...
+                List<int> idsEmpleados;
+                if(HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS") != null)
+                {
+                    idsEmpleados = HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
+                }
+                else
+                {
+                    idsEmpleados = new List<int>();
+                }
+                idsEmpleados.Add(idEmpleado.Value);
+                HttpContext.Session.SetObject("IDSEMPLEADOS", idsEmpleados);
+            }
+            List<Empleado> empleados = await this.repo.GetEmpleadosAsync();
+            return View(empleados);
+        }
+
+        public async Task<IActionResult> EmpleadosAlmacenadosOk()
+        {
+            return View();
+        }
+
     }
 }
