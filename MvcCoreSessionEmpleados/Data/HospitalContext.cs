@@ -7,6 +7,6 @@ namespace MvcCoreSessionEmpleados.Data
     {
         public HospitalContext(DbContextOptions<HospitalContext> options): base(options) { }
 
-        public DbSet<Empleado> Empleados;
+        public DbSet<Empleado> Empleados { get; set; }
     }
 }
