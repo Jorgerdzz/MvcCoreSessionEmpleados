@@ -44,5 +44,36 @@ namespace MvcCoreSessionEmpleados.Controllers
         {
             return View();
         }
+
+        public async Task<IActionResult> SessionEmpleados(int? idEmpleado)
+        {
+            if(idEmpleado != null)
+            {
+                Empleado emp = await this.repo.FindEmpleadoAsync(idEmpleado.Value);
+                //VAMOS A GUARDAR EN SESSION UN CONJUNTO DE EMPLEAODOS
+                List<Empleado> empleadosList;
+                //PREGUNTAMOS SI HAY EMPLEADOS EN SESSION
+                if(HttpContext.Session.GetObject<List<Empleado>>("EMPLEADOS") != null)
+                {
+                    //RECUPERAMOS LA LISTA DE SESSION
+                    empleadosList = HttpContext.Session.GetObject<List<Empleado>>("EMPLEADOS");
+                }
+                else
+                {
+                    //CREAMOS UNA NUEVA LISTA PARA ALMACENAR LOS EMPLEADOS
+                    empleadosList = new List<Empleado>();
+                }
+                empleadosList.Add(emp);
+                HttpContext.Session.SetObject("EMPLEADOS", empleadosList);
+                ViewData["MENSAJE"] = "Empleado " + emp.Apellido + " almacenado correctamente.";
+            }
+            List<Empleado> empleados = await this.repo.GetEmpleadosAsync();
+            return View(empleados);
+        }
+
+        public IActionResult EmpleadosAlmacenados()
+        {
+            return View();
+        }
     }
 }
