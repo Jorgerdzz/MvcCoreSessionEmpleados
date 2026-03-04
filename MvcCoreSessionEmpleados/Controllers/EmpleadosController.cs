@@ -154,5 +154,41 @@ namespace MvcCoreSessionEmpleados.Controllers
             }
         }
 
+        public async Task<IActionResult> SessionEmpleadosV5(int? idEmpleado)
+        {
+            List<int> idsEmpleados;
+            if (idEmpleado != null)
+            {
+                //ALMACENAMOS LO MINIMO...
+                if (HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS") != null)
+                {
+                    idsEmpleados = HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
+                }
+                else
+                {
+                    idsEmpleados = new List<int>();
+                }
+                idsEmpleados.Add(idEmpleado.Value);
+                HttpContext.Session.SetObject("IDSEMPLEADOS", idsEmpleados);
+            }
+            List<Empleado> empleados = await this.repo.GetEmpleadosAsync();
+            return View(empleados);
+        }
+
+        public async Task<IActionResult> EmpleadosAlmacenadosV5()
+        {
+            List<int> idsEmpleados = HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
+            if (idsEmpleados == null)
+            {
+                ViewData["MENSAJE"] = "No existen empleados en Session";
+                return View();
+            }
+            else
+            {
+                List<Empleado> empleados = await this.repo.GetEmpleadosSessionAsync(idsEmpleados);
+                return View(empleados);
+            }
+        }
+
     }
 }

@@ -1,0 +1,44 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    //NECESITAMOS SESSION EN LA VISTA PARA COMPROBAR SUS DATOS
+    List<int> ids = @Context.Session.GetObject<List<int>>("IDSEMPLEADOS");
+}
+@model List<Empleado>
+<h1 style="color:green"> Session empleados V5</h1>
+
+<p>
+    <a asp-controller="Empleados" asp-action="EmpleadosAlmacenadosv5">Empleados almacenados v5</a>
+</p>
+
+<h4>@ViewData["MENSAJE"]</h4>
+
+@if (Model != null)
+{
+    <ul class="list-group">
+        @foreach (Empleado empleado in Model)
+        {
+            <li class="list-group-item">
+                @empleado.Apellido
+                @if (ids == null)
+                {
+                    //NO TENEMOS SESSION
+                    <a asp-controller="Empleados" asp-action="SessionEmpleadosV5" asp-route-idEmpleado="@empleado.IdEmpleado">Almacenar empleado</a>
+                }
+                else
+                {
+                    //BUSCAMOS SI EL EMPLEADO QUE ESTAMOS RECORRIENDO ESTA EN LA LISTA
+                    if (ids.Contains(empleado.IdEmpleado))
+                    {
+                        <img src="~/images/Álvaro_Arbeloa.jpg" style="width: 40px; height:40px;"/>
+                    }
+                    else
+                    {
+                        <a asp-controller="Empleados" asp-action="SessionEmpleadosV5" asp-route-idEmpleado="@empleado.IdEmpleado">Almacenar empleado</a>
+                    }
+                }
+            </li>
+        }
+    </ul>
+}
