@@ -157,7 +157,7 @@ namespace MvcCoreSessionEmpleados.Controllers
             }
         }
 
-        [ResponseCache(Duration = 80, Location = ResponseCacheLocation.Client)]
+        //[ResponseCache(Duration = 80, Location = ResponseCacheLocation.Client)]
         public async Task<IActionResult> SessionEmpleadosV5(int? idEmpleado, int? idfavorito)
         {
             if (idfavorito != null)
@@ -201,19 +201,10 @@ namespace MvcCoreSessionEmpleados.Controllers
 
         public IActionResult EmpleadosFavoritos()
         {
-            if(this.memoryCache.Get("FAVORITOS") == null)
-            {
-                ViewData["MENSAJE"] = "No tenemos empleados favoritos";
-                return View();
-            }
-            else
-            {
-                List<Empleado> favoritos = this.memoryCache.Get<List<Empleado>>("FAVORITOS");
-                return View(favoritos);
-            }
+            return View();
         }
 
-        [ResponseCache(Duration = 80, Location = ResponseCacheLocation.Client)]
+        //[ResponseCache(Duration = 80, Location = ResponseCacheLocation.Client)]
         public async Task<IActionResult> EmpleadosAlmacenadosV5(int? ideliminar)
         {
             List<int> idsEmpleados = HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
