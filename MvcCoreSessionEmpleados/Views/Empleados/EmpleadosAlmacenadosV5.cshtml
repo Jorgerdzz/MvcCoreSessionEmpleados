@@ -10,6 +10,10 @@
     <a asp-controller="Empleados" asp-action="SessionEmpleadosV5">Volver a session empleados</a>
 </p>
 
+@if(Context.Session.GetString("IDSEMPLEADOS") == null){
+    <h1 style="color:red">No existen empleados en Session</h1>
+}
+
 @if (Model != null)
 {
     <table class="table">
@@ -55,7 +59,7 @@
                     <td>
                         @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
                         @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                        @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                        <a asp-controller="Empleados" asp-action="EmpleadosAlmacenadosV5" asp-route-ideliminar="@item.IdEmpleado">Eliminar Sesion</a>
                     </td>
                 </tr>
             }

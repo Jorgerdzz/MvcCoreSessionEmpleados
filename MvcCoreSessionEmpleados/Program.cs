@@ -5,8 +5,10 @@ using MvcCoreSessionEmpleados.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddMemoryCache(); //Para el cache personalizado
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<RepositoryEmpleados>();
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using MvcCoreSessionEmpleados.Extensions;
 using MvcCoreSessionEmpleados.Models;
 using MvcCoreSessionEmpleados.Repositories;
@@ -8,10 +9,12 @@ namespace MvcCoreSessionEmpleados.Controllers
     public class EmpleadosController : Controller
     {
         private RepositoryEmpleados repo;
+        private IMemoryCache memoryCache;
 
-        public EmpleadosController(RepositoryEmpleados repo)
+        public EmpleadosController(RepositoryEmpleados repo, IMemoryCache memoryCache)
         {
             this.repo = repo;
+            this.memoryCache = memoryCache;
         }
 
         public async Task<IActionResult> SessionSalarios(int? salario)
@@ -154,8 +157,29 @@ namespace MvcCoreSessionEmpleados.Controllers
             }
         }
 
-        public async Task<IActionResult> SessionEmpleadosV5(int? idEmpleado)
+        [ResponseCache(Duration = 80, Location = ResponseCacheLocation.Client)]
+        public async Task<IActionResult> SessionEmpleadosV5(int? idEmpleado, int? idfavorito)
         {
+            if (idfavorito != null)
+            {
+                //COMO ESTOY ALMACENANDO EN CACHE, VAMOS A GUARDAR
+                //DIRECTAMENTE LOS OBJETOS EN LUGAR DE LOS IDS
+                List<Empleado> empleadosFavoritos;
+                if(this.memoryCache.Get("FAVORITOS") == null)
+                {
+                    //NO EXISTE NADA EN CACHE
+                    empleadosFavoritos = new List<Empleado>();
+                }
+                else
+                {
+                    //RECUPERAMOS EL CACHE
+                    empleadosFavoritos = this.memoryCache.Get<List<Empleado>> ("FAVORITOS");
+                }
+                //BUSCAMOS AL EMPLEADO PARA GUARDARLO
+                Empleado empleadoFavorito = await this.repo.FindEmpleadoAsync(idfavorito.Value);
+                empleadosFavoritos.Add(empleadoFavorito);
+                this.memoryCache.Set("FAVORITOS", empleadosFavoritos);
+            }
             List<int> idsEmpleados;
             if (idEmpleado != null)
             {
@@ -175,7 +199,22 @@ namespace MvcCoreSessionEmpleados.Controllers
             return View(empleados);
         }
 
-        public async Task<IActionResult> EmpleadosAlmacenadosV5()
+        public IActionResult EmpleadosFavoritos()
+        {
+            if(this.memoryCache.Get("FAVORITOS") == null)
+            {
+                ViewData["MENSAJE"] = "No tenemos empleados favoritos";
+                return View();
+            }
+            else
+            {
+                List<Empleado> favoritos = this.memoryCache.Get<List<Empleado>>("FAVORITOS");
+                return View(favoritos);
+            }
+        }
+
+        [ResponseCache(Duration = 80, Location = ResponseCacheLocation.Client)]
+        public async Task<IActionResult> EmpleadosAlmacenadosV5(int? ideliminar)
         {
             List<int> idsEmpleados = HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
             if (idsEmpleados == null)
@@ -185,6 +224,23 @@ namespace MvcCoreSessionEmpleados.Controllers
             }
             else
             {
+                //PREGUNTAMOS SI HEMOS RECIBIDO ALGUN DATO PARA ELIMINAR
+                if(ideliminar != null)
+                {
+                    idsEmpleados.Remove(ideliminar.Value);
+                    //SI NO TENEMOS EMPLEADOS EN SESSION, NUESTRA COLECCION EXISTE Y SE QUEDA A 0
+                    //ELIMINAMOS SESSION
+                    if(idsEmpleados.Count == 0)
+                    {
+                        HttpContext.Session.Remove("IDSEMPLEADOS");
+                        return View();
+                    }
+                    else
+                    {
+                        //ACTUALIZAMOS SESSION
+                        HttpContext.Session.SetObject("IDSEMPLEADOS", idsEmpleados);
+                    }
+                }
                 List<Empleado> empleados = await this.repo.GetEmpleadosSessionAsync(idsEmpleados);
                 return View(empleados);
             }
