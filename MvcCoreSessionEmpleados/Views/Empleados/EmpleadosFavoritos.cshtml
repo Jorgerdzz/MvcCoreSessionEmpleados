@@ -2,7 +2,7 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
-    List<Empleado> favoritos = memoryCache.Get<List<Empleado>>("FAVORITOS");
+    List<Empleado> favoritos = this.memoryCache.Get<List<Empleado>>("FAVORITOS");
 }
 
 <h1>Empleados favoritos</h1>
@@ -33,10 +33,11 @@
                 <th>
                     Departamento
                 </th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @foreach (var item in favoritos)
             {
                 <tr>
                     <td>
@@ -53,6 +54,9 @@
                     </td>
                     <td>
                         @item.IdDepartamento
+                    </td>
+                    <td>
+                        <a class="btn btn-danger" asp-controller="Empleados" asp-action="EmpleadosFavoritos" asp-route-ideliminar="@item.IdEmpleado">Delete</a>
                     </td>
                 </tr>
             }

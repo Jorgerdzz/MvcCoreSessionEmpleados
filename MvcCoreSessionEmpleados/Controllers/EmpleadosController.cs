@@ -199,8 +199,23 @@ namespace MvcCoreSessionEmpleados.Controllers
             return View(empleados);
         }
 
-        public IActionResult EmpleadosFavoritos()
+        public IActionResult EmpleadosFavoritos(int? idEliminar)
         {
+            if(idEliminar != null)
+            {
+                List<Empleado> empFavoritos = this.memoryCache.Get<List<Empleado>>("FAVORITOS");
+                //BUSCAMOS AL EMPLEADO A ELIMINAR POR SU ID
+                Empleado delete = empFavoritos.Find(e => e.IdEmpleado == idEliminar.Value);
+                empFavoritos.Remove(delete);
+                if(empFavoritos.Count == 0)
+                {
+                    this.memoryCache.Remove("FAVORITOS");
+                }
+                else
+                {
+                    this.memoryCache.Set("FAVORITOS", empFavoritos);
+                }
+            }
             return View();
         }
 
