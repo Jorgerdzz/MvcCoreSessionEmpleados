@@ -42,7 +42,24 @@ else
         {
             <li class="list-group-item">
                 @empleado.Apellido
-                <a asp-controller="Empleados" asp-action="SessionEmpleadosV5" asp-route-idfavorito="@empleado.IdEmpleado">Favorito</a>
+                @if(favoritos == null)
+                {
+                   <a asp-controller="Empleados" asp-action="SessionEmpleadosV5" asp-route-idfavorito="@empleado.IdEmpleado">Favorito</a>
+                }
+                else
+                {
+                    Empleado empFavorito =
+                        favoritos.Find(e => e.IdEmpleado == empleado.IdEmpleado);
+                    if(empFavorito == null)
+                    {
+                        <a asp-controller="Empleados" asp-action="SessionEmpleadosV5" asp-route-idfavorito="@empleado.IdEmpleado">Favorito</a>
+                    }
+                    else
+                    {
+                        <img src="~/images/Álvaro_Arbeloa.jpg" style="width:30px; height:30px"/>
+                    }
+                }
+
 
                 @if (ids == null)
                 {
